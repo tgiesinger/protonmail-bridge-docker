@@ -14,13 +14,13 @@ GitHub: [https://github.com/shenxn/protonmail-bridge-docker](https://github.com/
 
 ## ARM Support
 
-We now support ARM devices (`arm64` and `arm/v7`)! Use the images tagged with `build`. See next section for details.
+ARM devices (`arm64`) are supported! Use the images tagged with `build`. See next section for details. 32-bit ARM (`arm/v7`) is no longer supported: since v3.22 the bridge does not compile for 32-bit platforms.
 
 ## Tags
 
 There are two types of images.
  - `deb`: Images based on the official [.deb release](https://protonmail.com/bridge/install). It only supports the `amd64` architecture.
- - `build`: Images based on the [source code](https://github.com/ProtonMail/proton-bridge). It supports `amd64`, `arm64`, `arm/v7` and `riscv64`. Supporting to more architectures is possible. PRs are welcome.
+ - `build`: Images based on the [source code](https://github.com/ProtonMail/proton-bridge). It supports `amd64`, `arm64` and `riscv64`. Supporting to more architectures is possible. PRs are welcome.
 
 tag | description
  -- | --

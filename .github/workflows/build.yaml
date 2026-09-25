@@ -105,14 +105,14 @@ jobs:
       packages: write
     strategy:
       fail-fast: false
+      # 64-bit only: since v3.22 the bridge's libfido2 bindings do not compile
+      # on 32-bit targets (e.g. linux/arm/v7).
       matrix:
         include:
           - platform: linux/amd64
             runner: ubuntu-24.04
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
-          - platform: linux/arm/v7
-            runner: ubuntu-24.04
           - platform: linux/riscv64
             runner: ubuntu-24.04
     steps:
