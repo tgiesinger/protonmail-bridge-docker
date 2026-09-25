@@ -2,6 +2,8 @@ name: update check
 
 on:
   push:
+    branches:
+      - main
     paths:
       - .github/workflows/update-check.yaml
       - update-check.py
@@ -10,15 +12,48 @@ on:
       - .github/workflows/update-check.yaml
       - update-check.py
   schedule:
-  - cron: '0 0 * * *'  # runs everyday at midnight
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
-      with:
-        token: ${{ secrets.PERSONAL_TOKEN }}
-    - name: Check Update
-      run: python3 update-check.py ${{ github.event_name == 'pull_request' }}
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check update
+        id: check
+        run: python3 update-check.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show changes
+        run: git diff --stat
+
+      # PRs opened with GITHUB_TOKEN do not trigger other workflows, so set a
+      # PERSONAL_TOKEN secret (contents + pull requests write) to get CI on them.
+      - name: Open pull request
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN || secrets.GITHUB_TOKEN }}
+          branch: update/proton-bridge
+          delete-branch: true
+          add-paths: |
+            VERSION
+            deb/PACKAGE
+          commit-message: Bump version to ${{ steps.check.outputs.version }}
+          title: Bump version to ${{ steps.check.outputs.version }}
+          body: |
+            Updates Proton Mail Bridge to [${{ steps.check.outputs.version }}](https://github.com/ProtonMail/proton-bridge/releases/tag/${{ steps.check.outputs.version }}).
+
+            Merging this publishes new images.
