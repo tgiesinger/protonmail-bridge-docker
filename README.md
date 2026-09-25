@@ -79,6 +79,10 @@ Besides, you can publish only port 25 (SMTP) if you don't need to receive any em
 
 The bridge currently only supports some of the email clients. More details can be found on the official website. I've tested this on a Synology DiskStation and it runs well. However, you may need ssh onto it to run the interactive docker command to add your account. The main reason of using this instead of environment variables is that it seems to be the best way to support two-factor authentication.
 
+## Auto-updates
+
+The bridge downloads updates into the data volume (`/root/.local/share/protonmail/bridge-v3/updates`) and prefers them over the version shipped in the image. A newer bridge may need system libraries the image does not have (e.g. `libfido2.so.1: cannot open shared object file`), so the entrypoint deletes that folder on every start and always runs the image's own version. To update the bridge, pull a newer image. You can also disable the downloads with `autoupdates off` in the bridge CLI.
+
 ## Bridge CLI Guide
 
 The initialization step exposes the bridge CLI so you can do things like switch between combined and split mode, change proxy, etc. The [official guide](https://protonmail.com/support/knowledge-base/bridge-cli-guide/) gives more information on to use the CLI.
