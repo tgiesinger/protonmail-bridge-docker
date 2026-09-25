@@ -2,6 +2,11 @@
 
 set -ex
 
+# The bridge downloads auto-updates into the data volume and launches them in
+# preference to the version shipped in the image. Those updates can need
+# libraries the image lacks (e.g. libfido2), so always run the image's version.
+rm -rf "${HOME}/.local/share/protonmail/bridge-v3/updates"
+
 # Initialize
 if [[ $1 == init ]]; then
 

@@ -2,6 +2,11 @@
 
 set -ex
 
+# The bridge downloads auto-updates into the data volume and launches them in
+# preference to the version shipped in the image. Those updates can need
+# libraries the image lacks (e.g. libfido2), so always run the image's version.
+rm -rf "${HOME}/.local/share/protonmail/bridge-v3/updates"
+
 # Initialize
 if [[ $1 == init ]]; then
 
@@ -13,10 +18,10 @@ if [[ $1 == init ]]; then
     # This allows users to run entrypoint init inside a running conainter
     # which is useful in a k8s environment.
     # || true to make sure this would not fail in case there is no running instance.
-    pkill protonmail-bridge || true
+    pkill -x "proton-bridge|bridge" || true
 
     # Login
-    /protonmail/proton-bridge --cli $@
+    /protonmail/proton-bridge --cli "$@"
 
 else
 
@@ -30,6 +35,6 @@ else
     # Fake a terminal, so it does not quit because of EOF...
     rm -f faketty
     mkfifo faketty
-    cat faketty | /protonmail/proton-bridge --cli $@
+    cat faketty | /protonmail/proton-bridge --cli "$@"
 
 fi
